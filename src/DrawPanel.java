@@ -6,11 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import models.Bird;
-import models.Bridge;
-import models.Cloud;
-import models.Sun;
-import models.Wave;
+import models.*;
 
 public class DrawPanel extends JPanel implements ActionListener {
 
@@ -28,6 +24,8 @@ public class DrawPanel extends JPanel implements ActionListener {
     private int horizonY;
 
     Sun s1 = new Sun(670, 75, 30, 30, 15, Color.ORANGE);
+    Ship cruiseShip = new Ship(75, 300, 500, 50,
+        Color.BLUE, Color.WHITE, Color.YELLOW, 2);
 
     public DrawPanel(final int width, final int height, final int timerDelay) {
         this.PANEL_WIDTH = Math.max(width, 1);
@@ -40,6 +38,8 @@ public class DrawPanel extends JPanel implements ActionListener {
 
         timer = new Timer(timerDelay, this);
         timer.start();
+
+        cruiseShip.setPanelWidth(PANEL_WIDTH);
 
         initializeSea();
         initializeBirds();
@@ -59,28 +59,18 @@ public class DrawPanel extends JPanel implements ActionListener {
         waves = new ArrayList<>();
         Random random = new Random();
 
-        int waveCount = 15 + random.nextInt(6);
+        int mainWaveY = cruiseShip.getY() + 20;
+        Wave mainWave = new Wave(0, mainWaveY, PANEL_WIDTH, 15, 2);
+        waves.add(mainWave);
 
+        int waveCount = 20 + random.nextInt(5);
         for (int i = 0; i < waveCount; i++) {
-            int waveHeight = 5 + random.nextInt(20);
-            int waveSpeed = 1 + random.nextInt(5);
-
-            int seaHeight = PANEL_HEIGHT - horizonY;
-            int yPosition = horizonY + random.nextInt(seaHeight - waveHeight);
+            int waveHeight = 5 + random.nextInt(15);
+            int waveSpeed = 1 + random.nextInt(3);
+            int yPosition = horizonY + random.nextInt(PANEL_HEIGHT - horizonY);
 
             Wave wave = new Wave(0, yPosition, PANEL_WIDTH, waveHeight, waveSpeed);
-            wave.setTicksOffset(i * 15 + random.nextInt(30));
-            waves.add(wave);
-        }
-
-        for (int i = 0; i < 10; i++) {
-            int waveHeight = 2 + random.nextInt(8);
-            int waveSpeed = 2 + random.nextInt(4);
-            int seaHeight = PANEL_HEIGHT - horizonY;
-            int yPosition = horizonY + random.nextInt(seaHeight - waveHeight - 20);
-
-            Wave wave = new Wave(0, yPosition, PANEL_WIDTH, waveHeight, waveSpeed);
-            wave.setTicksOffset(i * 25 + random.nextInt(40));
+            wave.setTicksOffset(i * 20 + random.nextInt(30));
             waves.add(wave);
         }
     }
@@ -90,11 +80,9 @@ public class DrawPanel extends JPanel implements ActionListener {
         Random random = new Random();
 
         int cloudsCount = 3 + random.nextInt(3);
-
         for (int i = 0; i < cloudsCount; i++) {
             int x = 10 + random.nextInt(550);
             int y = random.nextInt(horizonY - 105);
-
             Cloud c = Cloud.createRandom(x, y);
             clouds.add(c);
         }
@@ -105,7 +93,6 @@ public class DrawPanel extends JPanel implements ActionListener {
         Random random = new Random();
 
         int birdCount = 3 + random.nextInt(4);
-
         for (int i = 0; i < birdCount; i++) {
             int startX = random.nextInt(PANEL_WIDTH);
             int baseY = 30 + random.nextInt(horizonY - 50);
@@ -127,7 +114,6 @@ public class DrawPanel extends JPanel implements ActionListener {
 
         drawSky(g);
         s1.draw(g);
-
         bridge.draw(g);
 
         g.setColor(new Color(0, 105, 148));
@@ -137,6 +123,11 @@ public class DrawPanel extends JPanel implements ActionListener {
             wave.update(ticksFromStart);
             wave.draw(g);
         }
+
+        cruiseShip.update();
+        adjustShipToWaves();
+
+        cruiseShip.draw(g);
 
         for (Cloud cloud : clouds) {
             cloud.draw(g);
@@ -157,6 +148,19 @@ public class DrawPanel extends JPanel implements ActionListener {
             wave.draw(g);
         }
         g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+    }
+
+    private void adjustShipToWaves() {
+        int shipX = cruiseShip.getX() + cruiseShip.getLength() / 2;
+        int lowestWaveY = PANEL_HEIGHT;
+
+        for (Wave wave : waves) {
+            int waveY = wave.getWaveHeightAt(shipX, ticksFromStart);
+            if (waveY < lowestWaveY) {
+                lowestWaveY = waveY;
+            }
+        }
+        cruiseShip.setY(lowestWaveY - 10);
     }
 
     private void drawSky(Graphics2D g) {
