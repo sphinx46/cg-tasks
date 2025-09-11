@@ -1,6 +1,7 @@
 package models;
 
 import java.awt.*;
+import java.util.Random;
 
 public class Cloud {
     private int x, y, baseDiameter, overlap;
@@ -110,8 +111,9 @@ public class Cloud {
         }
 
         public static CloudSize getRandom() {
-            CloudSize[] sizes = values();
-            return sizes[(int) (Math.random() * sizes.length)];
+            Random random = new Random();
+            Cloud.CloudSize[] types = values();
+            return types[random.nextInt(types.length)];
         }
     }
 

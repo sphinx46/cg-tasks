@@ -26,6 +26,8 @@ public class DrawPanel extends JPanel implements ActionListener {
     Sun s1 = new Sun(670, 75, 30, 30, 15, Color.ORANGE);
     Ship cruiseShip = new Ship(75, 300, 500, 50,
         Color.BLUE, Color.WHITE, Color.YELLOW, 2);
+    Car car = Car.createRandom(100, 200);
+
 
     public DrawPanel(final int width, final int height, final int timerDelay) {
         this.PANEL_WIDTH = Math.max(width, 1);
@@ -139,6 +141,8 @@ public class DrawPanel extends JPanel implements ActionListener {
                 bird.draw(g);
             }
         }
+
+        car.draw(g);
 
         g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.4f));
         for (int i = 0; i < waves.size() / 2; i++) {
