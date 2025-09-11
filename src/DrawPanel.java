@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Random;
 
 import models.Bird;
+import models.Bridge;
 import models.Cloud;
 import models.Sun;
 import models.Wave;
@@ -22,6 +23,7 @@ public class DrawPanel extends JPanel implements ActionListener {
     private List<Wave> waves;
     private List<Bird> birds;
     private List<Cloud> clouds;
+    private Bridge bridge;
 
     private int horizonY;
 
@@ -42,6 +44,15 @@ public class DrawPanel extends JPanel implements ActionListener {
         initializeSea();
         initializeBirds();
         initalizeCloud();
+        initializeBridge();
+    }
+
+    private void initializeBridge() {
+        int bridgeY = horizonY - 15;
+        int bridgeHeight = 5;
+        int archHeight = 20;
+        bridge = new Bridge(0, bridgeY, PANEL_WIDTH, bridgeHeight,
+            new Color(160, 82, 45), archHeight);
     }
 
     private void initializeSea() {
@@ -108,7 +119,6 @@ public class DrawPanel extends JPanel implements ActionListener {
         }
     }
 
-
     @Override
     public void paint(final Graphics gr) {
         super.paint(gr);
@@ -116,9 +126,9 @@ public class DrawPanel extends JPanel implements ActionListener {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         drawSky(g);
-
         s1.draw(g);
 
+        bridge.draw(g);
 
         g.setColor(new Color(0, 105, 148));
         g.fillRect(0, horizonY, PANEL_WIDTH, PANEL_HEIGHT - horizonY);
@@ -138,8 +148,6 @@ public class DrawPanel extends JPanel implements ActionListener {
                 bird.draw(g);
             }
         }
-
-
 
         g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.4f));
         for (int i = 0; i < waves.size() / 2; i++) {
