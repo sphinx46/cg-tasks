@@ -4,12 +4,12 @@ import java.awt.*;
 
 public class Bird {
     private int x, y;
-    private int baseY;
-    private int speed;
-    private int amplitude;
-    private int size;
-    private Color color;
-    private int phaseOffset;
+    private final int baseY;
+    private final int speed;
+    private final int amplitude;
+    private final int size;
+    private final Color color;
+    private final int phaseOffset;
     private int panelWidth;
     private boolean isFlyingRight;
 
@@ -64,12 +64,5 @@ public class Bird {
         g.fillOval(x - 2, y - 2, 4, 4);
     }
 
-    public int getX() { return x; }
     public int getY() { return y; }
-    public int getBaseY() { return baseY; }
-    public boolean isFlyingRight() { return isFlyingRight; }
-
-    public boolean isInSky(int horizonY) {
-        return y < horizonY;
-    }
 }

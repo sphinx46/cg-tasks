@@ -4,67 +4,76 @@ import java.awt.*;
 import java.util.Random;
 
 public class Cloud {
-    private int x, y, baseDiameter, overlap;
-    private Color c;
-    private Color borderColor;
-    private int borderWidth;
+    private static final int DEFAULT_BORDER_WIDTH = 2;
+    private static final Color DEFAULT_BORDER_COLOR = Color.GRAY;
 
-    public Cloud(int x, int y, int baseDiameter, int overlap, Color c) {
-        this.x = x;
-        this.y = y;
-        this.baseDiameter = baseDiameter;
-        this.overlap = overlap;
-        this.c = c;
-        this.borderColor = Color.GRAY;
-        this.borderWidth = 2;
+    private final int x, y, baseDiameter, overlap;
+    private final Color fillColor;
+    private final Color borderColor;
+    private final int borderWidth;
+
+    public Cloud(int x, int y, int baseDiameter, int overlap, Color fillColor) {
+        this(x, y, baseDiameter, overlap, fillColor, DEFAULT_BORDER_COLOR, DEFAULT_BORDER_WIDTH);
     }
 
-    public Cloud(int x, int y, int baseDiameter, int overlap, Color c, Color borderColor, int borderWidth) {
+    public Cloud(int x, int y, int baseDiameter, int overlap,
+                 Color fillColor, Color borderColor, int borderWidth) {
         this.x = x;
         this.y = y;
         this.baseDiameter = baseDiameter;
         this.overlap = overlap;
-        this.c = c;
+        this.fillColor = fillColor;
         this.borderColor = borderColor;
         this.borderWidth = borderWidth;
     }
 
     public void draw(Graphics2D g) {
-        Stroke originalStroke = g.getStroke();
-        Color originalColor = g.getColor();
+        configureGraphicsForDrawing(g);
 
+        drawCloudOutlines(g);
+        drawCloudFill(g);
+
+    }
+
+    private void configureGraphicsForDrawing(Graphics2D g) {
         g.setStroke(new BasicStroke(borderWidth));
+    }
 
+    private void drawCloudOutlines(Graphics2D g) {
         g.setColor(borderColor);
-        g.drawOval(x, y, baseDiameter, baseDiameter);
-        g.drawOval(x + baseDiameter - overlap + 10, y - 10, baseDiameter, baseDiameter);
-        g.drawOval(x + baseDiameter - overlap + 35, y, baseDiameter, baseDiameter);
-        g.drawOval(x + baseDiameter - overlap + 10, y + 15, baseDiameter, baseDiameter);
-
-        g.setColor(c);
-        g.fillOval(x, y, baseDiameter, baseDiameter);
-        g.fillOval(x + baseDiameter - overlap + 10, y - 10, baseDiameter, baseDiameter);
-        g.fillOval(x + baseDiameter - overlap + 35, y, baseDiameter, baseDiameter);
-        g.fillOval(x + baseDiameter - overlap + 10, y + 15, baseDiameter, baseDiameter);
-
-        g.setStroke(originalStroke);
-        g.setColor(originalColor);
+        drawCloudCircles(g, false);
     }
 
-    public Color getBorderColor() {
-        return borderColor;
+    private void drawCloudFill(Graphics2D g) {
+        g.setColor(fillColor);
+        drawCloudCircles(g, true);
     }
 
-    public void setBorderColor(Color borderColor) {
-        this.borderColor = borderColor;
-    }
+    private void drawCloudCircles(Graphics2D g, boolean fill) {
+        int[] circleOffsetsX = {
+            0,
+            baseDiameter - overlap + 10,
+            baseDiameter - overlap + 35,
+            baseDiameter - overlap + 10
+        };
 
-    public int getBorderWidth() {
-        return borderWidth;
-    }
+        int[] circleOffsetsY = {
+            0,
+            -10,
+            0,
+            15
+        };
 
-    public void setBorderWidth(int borderWidth) {
-        this.borderWidth = borderWidth;
+        for (int i = 0; i < circleOffsetsX.length; i++) {
+            int circleX = x + circleOffsetsX[i];
+            int circleY = y + circleOffsetsY[i];
+
+            if (fill) {
+                g.fillOval(circleX, circleY, baseDiameter, baseDiameter);
+            } else {
+                g.drawOval(circleX, circleY, baseDiameter, baseDiameter);
+            }
+        }
     }
 
     public enum CloudSize {
@@ -78,7 +87,8 @@ public class Cloud {
         private final Color borderColor;
         private final int borderWidth;
 
-        CloudSize(int baseDiameter, int overlap, Color fillColor, Color borderColor, int borderWidth) {
+        CloudSize(int baseDiameter, int overlap, Color fillColor,
+                  Color borderColor, int borderWidth) {
             this.baseDiameter = baseDiameter;
             this.overlap = overlap;
             this.fillColor = fillColor;
@@ -86,34 +96,15 @@ public class Cloud {
             this.borderWidth = borderWidth;
         }
 
-        public int getBaseDiameter() {
-            return baseDiameter;
-        }
-
-        public int getOverlap() {
-            return overlap;
-        }
-
-        public Color getFillColor() {
-            return fillColor;
-        }
-
-        public Color getBorderColor() {
-            return borderColor;
-        }
-
-        public int getBorderWidth() {
-            return borderWidth;
-        }
-
         public Cloud createAt(int x, int y) {
-            return new Cloud(x, y, baseDiameter, overlap, fillColor, borderColor, borderWidth);
+            return new Cloud(x, y, baseDiameter, overlap,
+                fillColor, borderColor, borderWidth);
         }
 
         public static CloudSize getRandom() {
             Random random = new Random();
-            Cloud.CloudSize[] types = values();
-            return types[random.nextInt(types.length)];
+            CloudSize[] sizes = values();
+            return sizes[random.nextInt(sizes.length)];
         }
     }
 

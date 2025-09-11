@@ -4,12 +4,13 @@ import java.awt.*;
 import java.util.Random;
 
 public class Car {
-    private int x, y, width, height;
+    private int x, y;
+    private final int width,  height;
     private Color bodyColor;
-    private Color borderColor;
-    private int borderWidth;
-    private CarType type;
-    private int speed;
+    private final Color borderColor;
+    private final int borderWidth;
+    private final CarType type;
+    private final int speed;
 
     public Car(int x, int y, int width, int height, Color bodyColor, CarType type) {
         this.x = x;
@@ -23,13 +24,8 @@ public class Car {
         this.speed = 1 + new Random().nextInt(5);
     }
 
-    public int getX() { return x; }
-    public void setX(int x) { this.x = x; }
-    public int getY() { return y; }
     public void setY(int y) { this.y = y; }
-    public int getWidth() { return width; }
-    public int getHeight() { return height; }
-    public int getSpeed() { return speed; }
+
     public CarType getType() {
         return type;
     }

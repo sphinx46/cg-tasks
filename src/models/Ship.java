@@ -7,15 +7,15 @@ import java.util.Random;
 
 public class Ship {
     private int x, y;
-    private int length, height;
-    private Color hullColor;
-    private Color superstructureColor;
-    private Color windowColor;
-    private int speed;
+    private final int length, height;
+    private final Color hullColor;
+    private final Color superstructureColor;
+    private final Color windowColor;
+    private final int speed;
     private int panelWidth;
 
-    private List<float[]> smokeParticles;
-    private Random random;
+    private final List<float[]> smokeParticles;
+    private final Random random;
     private int smokeTimer;
 
     public Ship(int x, int y, int length, int height,
@@ -38,7 +38,6 @@ public class Ship {
     public int getY() { return y; }
     public int getLength() { return length; }
     public void setY(int y) { this.y = y; }
-    public void setSpeed(int speed) { this.speed = speed; }
     public void setPanelWidth(int panelWidth) { this.panelWidth = panelWidth; }
 
     public void update() {
@@ -58,6 +57,7 @@ public class Ship {
         drawWindows(g);
         drawFunnel(g);
         drawSmoke(g);
+        drawShipName(g);
 
         g.setRenderingHints(originalHints);
     }
@@ -168,5 +168,19 @@ public class Ship {
                 smokeParticles.remove(i);
             }
         }
+    }
+
+    private void drawShipName(Graphics2D g) {
+        int fontSize = Math.max(12, length / 25);
+        Font shipFont = new Font("Arial", Font.BOLD, fontSize);
+        g.setFont(shipFont);
+
+        g.setColor(Color.BLACK);
+
+        String shipName = "Антон Чехов";
+        int textX = x + length / 4;
+        int textY = y + height - 5;
+
+        g.drawString(shipName, textX, textY);
     }
 }

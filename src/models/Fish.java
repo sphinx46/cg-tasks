@@ -4,18 +4,17 @@ import java.awt.*;
 import java.util.Random;
 
 public class Fish {
-    private int x, y, width, height;
-    private int speed;
-    private Color bodyColor;
+    private int x, y;
+    private final int height, width;
+    private final int speed;
+    private final Color bodyColor;
     private int panelWidth;
     private int panelHeight;
     private int horizonY;
 
     private double angle;
-    private int amplitude;
+    private final int amplitude;
     private int baseY;
-
-    private Random random;
 
     public Fish(int x, int y, int width, int height, int speed) {
         this.x = x;
@@ -23,7 +22,7 @@ public class Fish {
         this.width = width;
         this.height = height;
         this.speed = speed;
-        this.random = new Random();
+        Random random = new Random();
 
         Color[] colors = {
             Color.RED,
@@ -42,12 +41,6 @@ public class Fish {
         this.baseY = y;
     }
 
-    public int getX() { return x; }
-    public int getY() { return y; }
-    public int getWidth() { return width; }
-    public int getHeight() { return height; }
-    public void setY(int y) { this.y = y; }
-    public void setSpeed(int speed) { this.speed = speed; }
     public void setPanelWidth(int panelWidth) { this.panelWidth = panelWidth; }
     public void setPanelHeight(int panelHeight) { this.panelHeight = panelHeight; }
     public void setHorizonY(int horizonY) { this.horizonY = horizonY; }
