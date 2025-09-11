@@ -19,6 +19,7 @@ public class DrawPanel extends JPanel implements ActionListener {
     private List<Wave> waves;
     private List<Bird> birds;
     private List<Cloud> clouds;
+    private List<Car> cars;
     private Bridge bridge;
 
     private int horizonY;
@@ -26,8 +27,6 @@ public class DrawPanel extends JPanel implements ActionListener {
     Sun s1 = new Sun(670, 75, 30, 30, 15, Color.ORANGE);
     Ship cruiseShip = new Ship(75, 300, 500, 50,
         Color.BLUE, Color.WHITE, Color.YELLOW, 2);
-    Car car = Car.createRandom(100, 200);
-
 
     public DrawPanel(final int width, final int height, final int timerDelay) {
         this.PANEL_WIDTH = Math.max(width, 1);
@@ -37,6 +36,8 @@ public class DrawPanel extends JPanel implements ActionListener {
 
         this.waves = new ArrayList<>();
         this.birds = new ArrayList<>();
+        this.clouds = new ArrayList<>();
+        this.cars = new ArrayList<>();
 
         timer = new Timer(timerDelay, this);
         timer.start();
@@ -45,8 +46,9 @@ public class DrawPanel extends JPanel implements ActionListener {
 
         initializeSea();
         initializeBirds();
-        initalizeCloud();
+        initializeCloud();
         initializeBridge();
+        initializeCars();
     }
 
     private void initializeBridge() {
@@ -57,8 +59,26 @@ public class DrawPanel extends JPanel implements ActionListener {
             new Color(160, 82, 45), archHeight);
     }
 
+    private void initializeCars() {
+        Random random = new Random();
+
+        for (int i = 0; i < 2 + random.nextInt(6); i++) {
+            int carX = -random.nextInt(300) - 100;
+            Car car = Car.createRandom(carX, 0);
+
+            int carY;
+            if (car.getType() == Car.CarType.MICROBUS) {
+                carY = bridge.getY() - 45;
+            } else {
+                carY = bridge.getY() - 35;
+            }
+
+            car.setY(carY);
+            cars.add(car);
+        }
+    }
+
     private void initializeSea() {
-        waves = new ArrayList<>();
         Random random = new Random();
 
         int mainWaveY = cruiseShip.getY() + 20;
@@ -77,10 +97,8 @@ public class DrawPanel extends JPanel implements ActionListener {
         }
     }
 
-    private void initalizeCloud() {
-        clouds = new ArrayList<>();
+    private void initializeCloud() {
         Random random = new Random();
-
         int cloudsCount = 3 + random.nextInt(3);
         for (int i = 0; i < cloudsCount; i++) {
             int x = 10 + random.nextInt(550);
@@ -91,9 +109,7 @@ public class DrawPanel extends JPanel implements ActionListener {
     }
 
     private void initializeBirds() {
-        birds = new ArrayList<>();
         Random random = new Random();
-
         int birdCount = 3 + random.nextInt(4);
         for (int i = 0; i < birdCount; i++) {
             int startX = random.nextInt(PANEL_WIDTH);
@@ -128,7 +144,6 @@ public class DrawPanel extends JPanel implements ActionListener {
 
         cruiseShip.update();
         adjustShipToWaves();
-
         cruiseShip.draw(g);
 
         for (Cloud cloud : clouds) {
@@ -142,7 +157,10 @@ public class DrawPanel extends JPanel implements ActionListener {
             }
         }
 
-        car.draw(g);
+        for (Car car : cars) {
+            car.update(PANEL_WIDTH);
+            car.draw(g);
+        }
 
         g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.4f));
         for (int i = 0; i < waves.size() / 2; i++) {

@@ -8,6 +8,10 @@ public class Bridge {
     private Color color;
     private int archHeight;
 
+    public int getY() {
+        return y;
+    }
+
     public Bridge(int x, int y, int width, int height, Color color, int archHeight) {
         this.x = x;
         this.y = y - 30;

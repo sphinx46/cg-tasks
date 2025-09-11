@@ -9,6 +9,7 @@ public class Car {
     private Color borderColor;
     private int borderWidth;
     private CarType type;
+    private int speed;
 
     public Car(int x, int y, int width, int height, Color bodyColor, CarType type) {
         this.x = x;
@@ -19,18 +20,25 @@ public class Car {
         this.type = type;
         this.borderColor = Color.BLACK;
         this.borderWidth = 2;
+        this.speed = 1 + new Random().nextInt(5);
     }
 
-    public Car(int x, int y, int width, int height, Color bodyColor, CarType type,
-               Color borderColor, int borderWidth) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-        this.bodyColor = bodyColor;
-        this.type = type;
-        this.borderColor = borderColor;
-        this.borderWidth = borderWidth;
+    public int getX() { return x; }
+    public void setX(int x) { this.x = x; }
+    public int getY() { return y; }
+    public void setY(int y) { this.y = y; }
+    public int getWidth() { return width; }
+    public int getHeight() { return height; }
+    public int getSpeed() { return speed; }
+    public CarType getType() {
+        return type;
+    }
+
+    public void update(int panelWidth) {
+        x += speed;
+        if (x > panelWidth) {
+            x = -width - new Random().nextInt(350);
+        }
     }
 
     public void draw(Graphics2D g) {
@@ -41,9 +49,7 @@ public class Car {
         g.setColor(borderColor);
 
         drawBody(g);
-
         drawWheels(g);
-
         drawDetails(g);
 
         g.setStroke(originalStroke);
@@ -93,96 +99,45 @@ public class Car {
 
         } else if (type == CarType.MICROBUS) {
             g.setColor(new Color(200, 230, 255));
-            g.fillRect(x + 2, y + 2, width / 2 - 4, height / 2 - 4);
+            g.fillRect(x + width / 2 + 2, y + 2, width / 2 - 4, height / 2 - 4);
             g.setColor(borderColor);
-            g.drawRect(x + 2, y + 2, width / 2 - 4, height / 2 - 4);
+            g.drawRect(x + width / 2 + 2, y + 2, width / 2 - 4, height / 2 - 4);
         }
     }
 
-    public Color getBorderColor() {
-        return borderColor;
-    }
-
-    public void setBorderColor(Color borderColor) {
-        this.borderColor = borderColor;
-    }
-
-    public int getBorderWidth() {
-        return borderWidth;
-    }
-
-    public void setBorderWidth(int borderWidth) {
-        this.borderWidth = borderWidth;
-    }
-
     public enum CarType {
-        SEDAN(60, 30, Color.RED, Color.BLACK, 2),
-        MICROBUS(75, 40, Color.BLUE, Color.BLACK, 2);
+        SEDAN(60, 30, Color.RED),
+        MICROBUS(75, 40, Color.BLUE);
 
         private final int width;
         private final int height;
         private final Color defaultColor;
-        private final Color borderColor;
-        private final int borderWidth;
 
-        CarType(int width, int height, Color defaultColor, Color borderColor, int borderWidth) {
+        CarType(int width, int height, Color defaultColor) {
             this.width = width;
             this.height = height;
             this.defaultColor = defaultColor;
-            this.borderColor = borderColor;
-            this.borderWidth = borderWidth;
-        }
-
-        public int getWidth() {
-            return width;
-        }
-
-        public int getHeight() {
-            return height;
-        }
-
-        public Color getDefaultColor() {
-            return defaultColor;
-        }
-
-        public Color getBorderColor() {
-            return borderColor;
-        }
-
-        public int getBorderWidth() {
-            return borderWidth;
         }
 
         public Car createAt(int x, int y) {
-            return new Car(x, y, width, height, defaultColor, this, borderColor, borderWidth);
+            return new Car(x, y, width, height, defaultColor, this);
         }
 
-        public Car createAt(int x, int y, Color customColor) {
-            return new Car(x, y, width, height, customColor, this, borderColor, borderWidth);
-        }
 
         public static CarType getRandom() {
-            Random random = new Random();
             CarType[] types = values();
-            return types[random.nextInt(types.length)];
+            return types[new Random().nextInt(types.length)];
         }
-    }
-
-    public static Car createSedan(int x, int y) {
-        return CarType.SEDAN.createAt(x, y);
-    }
-
-    public static Car createJeep(int x, int y) {
-        return CarType.MICROBUS.createAt(x, y);
     }
 
     public static Car createRandom(int x, int y) {
         Random random = new Random();
-
         int r = random.nextInt(256);
         int g = random.nextInt(256);
         int b = random.nextInt(256);
 
-        return CarType.getRandom().createAt(x, y, new Color(r, g, b));
+        Car car = CarType.getRandom().createAt(x, y);
+        car.bodyColor = new Color(r, g, b);
+        return car;
     }
 }
