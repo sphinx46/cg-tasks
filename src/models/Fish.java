@@ -1,11 +1,21 @@
 package models;
 
 import java.awt.*;
+import java.util.Random;
 
 public class Fish {
     private int x, y, width, height;
     private int speed;
     private Color bodyColor;
+    private int panelWidth;
+    private int panelHeight;
+    private int horizonY;
+
+    private double angle;
+    private int amplitude;
+    private int baseY;
+
+    private Random random;
 
     public Fish(int x, int y, int width, int height, int speed) {
         this.x = x;
@@ -13,11 +23,50 @@ public class Fish {
         this.width = width;
         this.height = height;
         this.speed = speed;
-        this.bodyColor = Color.ORANGE;
+        this.random = new Random();
+
+        Color[] colors = {
+            Color.RED,
+            Color.GREEN,
+            Color.BLUE,
+            Color.ORANGE,
+            Color.YELLOW,
+            Color.PINK,
+            Color.CYAN,
+            Color.MAGENTA
+        };
+        this.bodyColor = colors[random.nextInt(colors.length)];
+
+        this.angle = 0;
+        this.amplitude = 20;
+        this.baseY = y;
+    }
+
+    public int getX() { return x; }
+    public int getY() { return y; }
+    public int getWidth() { return width; }
+    public int getHeight() { return height; }
+    public void setY(int y) { this.y = y; }
+    public void setSpeed(int speed) { this.speed = speed; }
+    public void setPanelWidth(int panelWidth) { this.panelWidth = panelWidth; }
+    public void setPanelHeight(int panelHeight) { this.panelHeight = panelHeight; }
+    public void setHorizonY(int horizonY) { this.horizonY = horizonY; }
+
+    public void update() {
+        x += speed;
+
+        if (x > panelWidth) {
+            x = -width;
+            baseY = horizonY + 50 + (int)(Math.random() * (panelHeight - horizonY - 100));
+        }
+
+        angle += 0.1;
+        y = baseY + (int)(Math.sin(angle) * amplitude);
     }
 
     public void draw(Graphics2D g) {
-        Color originalColor = g.getColor();
+        RenderingHints originalHints = g.getRenderingHints();
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         drawTail(g);
         drawBody(g);
@@ -25,7 +74,7 @@ public class Fish {
         drawDorsalFin(g);
         drawVentralFin(g);
 
-        g.setColor(originalColor);
+        g.setRenderingHints(originalHints);
     }
 
     private void drawTail(Graphics2D g) {

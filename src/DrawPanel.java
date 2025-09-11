@@ -19,6 +19,7 @@ public class DrawPanel extends JPanel implements ActionListener {
     private List<Wave> waves;
     private List<Bird> birds;
     private List<Cloud> clouds;
+    private List<Fish> fishes;
     private List<Car> cars;
     private Bridge bridge;
 
@@ -27,7 +28,6 @@ public class DrawPanel extends JPanel implements ActionListener {
     Sun s1 = new Sun(670, 75, 30, 30, 15, Color.ORANGE);
     Ship cruiseShip = new Ship(75, 300, 500, 50,
         Color.BLUE, Color.WHITE, Color.YELLOW, 2);
-    Fish fish = new Fish(70, 50, 35, 15, 1);
 
     public DrawPanel(final int width, final int height, final int timerDelay) {
         this.PANEL_WIDTH = Math.max(width, 1);
@@ -39,6 +39,7 @@ public class DrawPanel extends JPanel implements ActionListener {
         this.birds = new ArrayList<>();
         this.clouds = new ArrayList<>();
         this.cars = new ArrayList<>();
+        this.fishes = new ArrayList<>();
 
         timer = new Timer(timerDelay, this);
         timer.start();
@@ -50,6 +51,7 @@ public class DrawPanel extends JPanel implements ActionListener {
         initializeCloud();
         initializeBridge();
         initializeCars();
+        initalizeFish();
     }
 
     private void initializeBridge() {
@@ -125,6 +127,24 @@ public class DrawPanel extends JPanel implements ActionListener {
         }
     }
 
+    private void initalizeFish() {
+        Random random = new Random();
+        int fishCount = 3 + random.nextInt(3);
+        for (int i = 0; i < fishCount; i++) {
+            int x = random.nextInt(PANEL_WIDTH);
+            int y = horizonY + 60 + random.nextInt(PANEL_HEIGHT - horizonY - 40);
+            int width = 25 + random.nextInt(10);
+            int height = 8 + random.nextInt(8);
+            int speed = 1 + random.nextInt(2);
+
+            Fish fish = new Fish(x, y, width, height, speed);
+            fish.setPanelWidth(PANEL_WIDTH);
+            fish.setPanelHeight(PANEL_HEIGHT);
+            fish.setHorizonY(horizonY);
+            fishes.add(fish);
+        }
+    }
+
     @Override
     public void paint(final Graphics gr) {
         super.paint(gr);
@@ -174,7 +194,10 @@ public class DrawPanel extends JPanel implements ActionListener {
         }
         g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
 
-        fish.draw(g);
+        for (Fish fish : fishes) {
+            fish.update();
+            fish.draw(g);
+        }
     }
 
     private void adjustShipToWaves() {
