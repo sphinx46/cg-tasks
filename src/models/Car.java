@@ -25,6 +25,8 @@ public class Car {
     }
 
     public void setY(int y) { this.y = y; }
+    public void setPanelWidth(int panelWidth) {
+    }
 
     public CarType getType() {
         return type;

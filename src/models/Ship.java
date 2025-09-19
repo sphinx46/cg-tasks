@@ -7,7 +7,8 @@ import java.util.Random;
 
 public class Ship {
     private int x, y;
-    private final int length, height;
+    private final int length;
+    private final int height;
     private final Color hullColor;
     private final Color superstructureColor;
     private final Color windowColor;
@@ -182,5 +183,9 @@ public class Ship {
         int textY = y + height - 5;
 
         g.drawString(shipName, textX, textY);
+    }
+
+    public int getHeight() {
+        return height;
     }
 }

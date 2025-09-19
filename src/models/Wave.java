@@ -4,8 +4,8 @@ import java.awt.*;
 
 public class Wave {
     private int x;
-    private final int y;
-    private final int width;
+    private int y;
+    private int width;
     private final int height;
     private final int speed;
     private final Color waveColor;
@@ -19,6 +19,10 @@ public class Wave {
         this.speed = speed;
         this.waveColor = new Color(0, 105, 148 + (int)(Math.random() * 40));
         this.ticksOffset = 0;
+    }
+
+    public void setWidth(int width) {
+        this.width = Math.max(width, 1);
     }
 
     public void update(int ticks) {
@@ -37,15 +41,16 @@ public class Wave {
 
         Polygon wavePolygon = new Polygon();
 
-        for (int i = 0; i <= width; i += 5) {
+        int step = Math.max(5, width / 200);
+        for (int i = 0; i <= width; i += step) {
             int waveX = x + i;
             double phase = (double)(waveX + ticksOffset * speed) / 30.0;
             int waveY = y - (int)(Math.sin(phase) * height / 2);
             wavePolygon.addPoint(waveX, waveY);
         }
 
-        wavePolygon.addPoint(x + width, y + height);
-        wavePolygon.addPoint(x, y + height);
+        wavePolygon.addPoint(x + width, y + height * 2);
+        wavePolygon.addPoint(x, y + height * 2);
 
         g.fillPolygon(wavePolygon);
     }

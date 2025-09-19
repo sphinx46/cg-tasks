@@ -4,11 +4,13 @@ import java.awt.*;
 import java.awt.geom.QuadCurve2D;
 
 public class Bridge {
-    private final int x, y, width, height;
+    private final int x, height;
+    private int y;
+    private int  width;
     private final Color color;
     private final int archHeight;
-    private final int pillarCount;
-    private final int pillarSpacing;
+    private int pillarCount;
+    private int pillarSpacing;
 
     public Bridge(int x, int y, int width, int height, Color color, int archHeight) {
         this.x = x;
@@ -19,10 +21,24 @@ public class Bridge {
         this.archHeight = archHeight;
         this.pillarCount = calculatePillarCount();
         this.pillarSpacing = width / pillarCount;
+        updatePillars();
     }
 
     public int getY() {
         return y;
+    }
+    public void setY(int y) {
+        this.y = y - 30;
+    }
+
+    public void setWidth(int width) {
+        updatePillars();
+        this.width = width;
+    }
+
+    public void updatePillars() {
+        this.pillarCount = calculatePillarCount();
+        this.pillarSpacing = width / pillarCount;
     }
 
     private int calculatePillarCount() {

@@ -5,7 +5,7 @@ import java.util.Random;
 
 public class Fish {
     private int x, y;
-    private final int height, width;
+    private final int width, height;
     private final int speed;
     private final Color bodyColor;
     private int panelWidth;
@@ -132,4 +132,9 @@ public class Fish {
 
         g.fillPolygon(finXPoints, finYPoints, 3);
     }
+
+    public int getY() {
+        return y;
+    }
+
 }

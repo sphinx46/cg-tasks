@@ -3,30 +3,43 @@ package models;
 import java.awt.*;
 
 public class Sun {
-    private int x, y, r, R, rays_number;
-    private Color c;
+    private int r;
+    private int R;
+    private final int rays_number;
+    private final Color c;
+    private int panelWidth;
+    private int panelHeight;
+    private final int margin = 20; // отступ от краев
 
-    public Sun(int x, int y, int r, int rayLength, int rays_number, Color c) {
-        this.x = x;
-        this.y = y;
+    public Sun(int r, int rayLength, int rays_number, Color c) {
         this.r = r;
         R = r + rayLength;
         this.rays_number = rays_number;
         this.c = c;
     }
 
-    public  void draw(Graphics2D g) {
+    public void setPanelDimensions(int width, int height) {
+        this.panelWidth = width;
+        this.panelHeight = height;
+    }
+
+    public void draw(Graphics2D g) {
+        if (panelWidth <= 0 || panelHeight <= 0) return;
+
+        int x = panelWidth - r - margin;
+        int y = r + margin;
+
         g.setColor(c);
-        g.fillOval(x - r, y - r, r + r, r + r);
+        g.fillOval(x - r, y - r, r * 2, r * 2);
 
         double da = 2 * Math.PI / rays_number;
 
         for (int i = 0; i < rays_number; i++) {
             double a = da * i;
             double x1 = x + (r + 10) * Math.cos(a);
-            double y1 = y + (r + 10)  * Math.sin(a);
-            double x2 = x + (R + 20)  * Math.cos(a);
-            double y2 = y + (R + 10)  * Math.sin(a);
+            double y1 = y + (r + 10) * Math.sin(a);
+            double x2 = x + (R + 20) * Math.cos(a);
+            double y2 = y + (R + 10) * Math.sin(a);
             g.drawLine((int) x1, (int) y1, (int) x2, (int) y2);
         }
     }
