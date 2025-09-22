@@ -105,6 +105,7 @@ public class DrawPanel extends JPanel implements ActionListener {
 
         if (cruiseShip != null) {
             cruiseShip.setPanelWidth(width);
+            cruiseShip.setY(horizonY + 30);
         }
 
         updateBridgeDimensions(width);
@@ -164,7 +165,7 @@ public class DrawPanel extends JPanel implements ActionListener {
     }
 
     private void initializeCruiseShip() {
-        this.cruiseShip = new Ship(75, horizonY + 50, 500, 50,
+        this.cruiseShip = new Ship(75, horizonY + 30, 500, 50,
             Color.BLUE, Color.WHITE, Color.YELLOW, 2);
         cruiseShip.setPanelWidth(getWidth());
     }
@@ -181,10 +182,12 @@ public class DrawPanel extends JPanel implements ActionListener {
         waves.clear();
 
         if (cruiseShip != null) {
-            int waveY = cruiseShip.getY() + cruiseShip.getHeight() - 5;
+            int waveY = horizonY + 50;
             Wave mainWave = new Wave(cruiseShip.getX() - 50, waveY, getWidth() + 100, 20, 2);
             mainWave.setTicksOffset(-20);
             waves.add(mainWave);
+
+            cruiseShip.setY(horizonY + 30);
         }
 
         int waveCount = DEFAULT_WAVE_COUNT + random.nextInt(RANDOM_WAVE_COUNT);
@@ -193,9 +196,10 @@ public class DrawPanel extends JPanel implements ActionListener {
             int waveHeight = 8 + random.nextInt(12);
             int waveSpeed = 1 + random.nextInt(3);
 
-            int minWaveY = horizonY + 20;
+            int minWaveY = horizonY + 30;
             int maxWaveY = getHeight() - waveHeight - 10;
-            if (maxWaveY < minWaveY) maxWaveY = minWaveY + 10;
+
+            if (maxWaveY < minWaveY) maxWaveY = minWaveY + 50;
 
             int yPosition = minWaveY + random.nextInt(Math.max(maxWaveY - minWaveY, 1));
 
@@ -261,8 +265,8 @@ public class DrawPanel extends JPanel implements ActionListener {
             int x = minX + random.nextInt(Math.max(maxX - minX, 50));
 
             int shipBottomY = cruiseShip.getY() + cruiseShip.getHeight();
-            int minFishY = shipBottomY + 20;
-            int maxFishY = getHeight() - 30;
+            int minFishY = shipBottomY + 70;
+            int maxFishY = getHeight() - 60;
 
             if (maxFishY < minFishY) maxFishY = minFishY + 30;
 
