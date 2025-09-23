@@ -1,3 +1,5 @@
+package ru.vsu.cs.computergraphics.mordvinovil.task1;
+
 import javax.swing.*;
 import java.awt.*;
 

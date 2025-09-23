@@ -1,4 +1,4 @@
-package models;
+package ru.vsu.cs.computergraphics.mordvinovil.task1.models;
 
 import java.awt.*;
 

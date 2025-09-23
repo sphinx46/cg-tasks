@@ -1,90 +1,73 @@
-import models.*;
-import javax.swing.*;
+package ru.vsu.cs.computergraphics.mordvinovil.task1.models;
+
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class DrawPanel extends JPanel implements ActionListener {
-
+public class World {
     private static final Color SKY_COLOR = new Color(135, 206, 235);
     private static final Color SEA_COLOR = new Color(0, 105, 148);
     private static final Color WAVE_REFLECTION_COLOR = new Color(255, 255, 255, 50);
     private static final float WAVE_REFLECTION_ALPHA = 0.4f;
-    private static final int MIN_SIZE_THRESHOLD = 50;
     private static final int DEFAULT_WAVE_COUNT = 20;
     private static final int RANDOM_WAVE_COUNT = 5;
+    private static final int MIN_SIZE_THRESHOLD = 50;
 
-    private final Timer timer;
-    private int ticksFromStart = 0;
-    private boolean initialized = false;
-
+    private int width;
+    private int height;
     private int horizonY;
     private int lastWidth = 0;
     private int lastHeight = 0;
+    private int ticksFromStart = 0;
 
     private final Sun sun;
     private Bridge bridge;
     private Ship cruiseShip;
-
     private final List<Wave> waves = new ArrayList<>();
     private final List<Bird> birds = new ArrayList<>();
     private final List<Cloud> clouds = new ArrayList<>();
     private final List<Fish> fishes = new ArrayList<>();
     private final List<Car> cars = new ArrayList<>();
-
     private final Random random = new Random();
 
-    public DrawPanel(final int timerDelay) {
+    private boolean initialized = false;
+
+    public World() {
         this.sun = new Sun(30, 30, 15, Color.ORANGE);
-        this.timer = new Timer(timerDelay, this);
-        timer.start();
     }
 
-    @Override
-    public void paint(final Graphics gr) {
-        super.paint(gr);
-
-        if (!isValidSize()) return;
-
-        Graphics2D g = (Graphics2D) gr;
-        setupRenderingHints(g);
+    public void update(int width, int height) {
+        this.width = Math.max(width, 1);
+        this.height = Math.max(height, 1);
 
         if (!initialized) {
-            initializeScene();
+            initialize();
+            initialized = true;
         } else {
             updateDimensions();
         }
-        drawScene(g);
+
+        updateMovingObjects();
+        ticksFromStart++;
     }
 
-    @Override
-    public void actionPerformed(final ActionEvent e) {
-        if (e.getSource() == timer) {
-            repaint();
-            ticksFromStart++;
-        }
+    public void draw(Graphics2D g) {
+        drawBackground(g);
+        drawStaticObjects(g);
+        drawSeaEnvironment(g);
+        drawMovingObjects(g);
+        drawWaveReflections(g);
     }
 
-    private boolean isValidSize() {
-        return getWidth() > 0 && getHeight() > 0;
-    }
-
-    private void setupRenderingHints(Graphics2D g) {
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    }
-
-    private void initializeScene() {
-        updateDimensions();
+    private void initialize() {
+        this.horizonY = (int)(height * 0.25);
         initializeAllEntities();
-        initialized = true;
+        lastWidth = width;
+        lastHeight = height;
     }
 
     private void updateDimensions() {
-        int width = Math.max(getWidth(), 1);
-        int height = Math.max(getHeight(), 1);
         this.horizonY = (int)(height * 0.25);
 
         boolean sizeChanged = hasSizeChangedSignificantly(width, height);
@@ -154,11 +137,11 @@ public class DrawPanel extends JPanel implements ActionListener {
     }
 
     private void initializeAllEntities() {
+        initializeClouds();
         initializeCruiseShip();
         initializeBridge();
         initializeSea();
         initializeBirds();
-        initializeClouds();
         initializeCars();
         initializeFish();
     }
@@ -166,14 +149,14 @@ public class DrawPanel extends JPanel implements ActionListener {
     private void initializeCruiseShip() {
         this.cruiseShip = new Ship(75, horizonY + 30, 500, 50,
             Color.BLUE, Color.WHITE, Color.YELLOW, 2);
-        cruiseShip.setPanelWidth(getWidth());
+        cruiseShip.setPanelWidth(width);
     }
 
     private void initializeBridge() {
         int bridgeY = horizonY - 15;
         int bridgeHeight = 5;
         int archHeight = 20;
-        this.bridge = new Bridge(0, bridgeY, getWidth(), bridgeHeight,
+        this.bridge = new Bridge(0, bridgeY, width, bridgeHeight,
             new Color(160, 82, 45), archHeight);
     }
 
@@ -182,10 +165,9 @@ public class DrawPanel extends JPanel implements ActionListener {
 
         if (cruiseShip != null) {
             int waveY = horizonY + 60;
-            Wave mainWave = new Wave(cruiseShip.getX() - 50, waveY, getWidth() + 100, 20, 2);
+            Wave mainWave = new Wave(cruiseShip.getX() - 50, waveY, width + 100, 20, 2);
             mainWave.setTicksOffset(-20);
             waves.add(mainWave);
-
             cruiseShip.setY(horizonY + 30);
         }
 
@@ -196,13 +178,13 @@ public class DrawPanel extends JPanel implements ActionListener {
             int waveSpeed = 1 + random.nextInt(3);
 
             int minWaveY = horizonY + 30;
-            int maxWaveY = getHeight() - waveHeight - 10;
+            int maxWaveY = height - waveHeight - 10;
 
             if (maxWaveY < minWaveY) maxWaveY = minWaveY + 50;
 
             int yPosition = minWaveY + random.nextInt(Math.max(maxWaveY - minWaveY, 1));
 
-            Wave wave = new Wave(-100, yPosition, getWidth() + 200, waveHeight, waveSpeed);
+            Wave wave = new Wave(-100, yPosition, width + 200, waveHeight, waveSpeed);
             wave.setTicksOffset(i * 25 + random.nextInt(40));
             waves.add(wave);
         }
@@ -213,7 +195,7 @@ public class DrawPanel extends JPanel implements ActionListener {
         int cloudsCount = 4 + random.nextInt(3);
 
         for (int i = 0; i < cloudsCount; i++) {
-            int x = 10 + random.nextInt(Math.max(getWidth() - 20, 100));
+            int x = 10 + random.nextInt(Math.max(width - 20, 100));
             int availableHeight = Math.max(horizonY - 105, 1);
             int y = random.nextInt(availableHeight);
             clouds.add(Cloud.createRandom(x, y));
@@ -225,7 +207,7 @@ public class DrawPanel extends JPanel implements ActionListener {
         int birdCount = 3 + random.nextInt(4);
 
         for (int i = 0; i < birdCount; i++) {
-            int startX = random.nextInt(Math.max(getWidth(), 100));
+            int startX = random.nextInt(Math.max(width, 100));
             int availableHeight = Math.max(horizonY - 50, 1);
             int baseY = 30 + random.nextInt(availableHeight);
             int speed = 2 + random.nextInt(3);
@@ -233,7 +215,7 @@ public class DrawPanel extends JPanel implements ActionListener {
             int size = 10 + random.nextInt(6);
 
             Bird bird = new Bird(startX, baseY, speed, amplitude, size, Color.BLACK);
-            bird.setPanelWidth(getWidth());
+            bird.setPanelWidth(width);
             birds.add(bird);
         }
     }
@@ -248,7 +230,7 @@ public class DrawPanel extends JPanel implements ActionListener {
 
             int carY = bridge.getY() - (car.getType() == Car.CarType.MICROBUS ? 45 : 35);
             car.setY(carY);
-            car.setPanelWidth(getWidth());
+            car.setPanelWidth(width);
 
             cars.add(car);
         }
@@ -264,10 +246,8 @@ public class DrawPanel extends JPanel implements ActionListener {
             int x = minX + random.nextInt(Math.max(maxX - minX, 60));
 
             int shipBottomY = cruiseShip.getY() + cruiseShip.getHeight();
-
             int minFishY = Math.max(shipBottomY + 105, horizonY + 100);
-
-            int maxFishY = Math.max(getHeight() - 60, minFishY + 50);
+            int maxFishY = Math.max(height - 60, minFishY + 50);
 
             if (maxFishY <= minFishY) {
                 maxFishY = minFishY + 100;
@@ -276,33 +256,64 @@ public class DrawPanel extends JPanel implements ActionListener {
             int yRange = Math.max(maxFishY - minFishY, 30);
             int y = minFishY + random.nextInt(yRange);
 
-            int width = 25 + random.nextInt(10);
-            int height = 8 + random.nextInt(8);
-            int speed = 1 + random.nextInt(2);
+            int fishWidth = 25 + random.nextInt(10);
+            int fishHeight = 8 + random.nextInt(8);
+            int speed = 3 + random.nextInt(2);
 
-            Fish fish = new Fish(x, y, width, height, speed);
-            fish.setPanelWidth(getWidth());
-            fish.setPanelHeight(getHeight());
+            Fish fish = new Fish(x, y, fishWidth, fishHeight, speed);
+            fish.setPanelWidth(width);
+            fish.setPanelHeight(height);
             fish.setHorizonY(horizonY);
 
             fishes.add(fish);
         }
     }
 
-    private void drawScene(Graphics2D g) {
-        drawBackground(g);
-        drawStaticObjects(g);
-        drawSeaEnvironment(g);
-        drawMovingObjects(g);
-        drawWaveReflections(g);
+    private void updateMovingObjects() {
+        for (Wave wave : waves) {
+            wave.update(ticksFromStart);
+        }
+
+        if (cruiseShip != null) {
+            cruiseShip.update();
+            adjustShipToWaves();
+        }
+
+        for (Bird bird : birds) {
+            bird.update(ticksFromStart);
+        }
+
+        for (Car car : cars) {
+            car.update(width);
+        }
+
+        for (Fish fish : fishes) {
+            fish.update();
+        }
+    }
+
+    private void adjustShipToWaves() {
+        if (cruiseShip == null) return;
+
+        int shipX = cruiseShip.getX() + cruiseShip.getLength() / 2;
+        int lowestWaveY = height;
+
+        for (Wave wave : waves) {
+            int waveY = wave.getWaveHeightAt(shipX, ticksFromStart);
+            if (waveY < lowestWaveY) {
+                lowestWaveY = waveY;
+            }
+        }
+
+        cruiseShip.setY(lowestWaveY - 10);
     }
 
     private void drawBackground(Graphics2D g) {
         g.setColor(SKY_COLOR);
-        g.fillRect(0, 0, getWidth(), horizonY);
+        g.fillRect(0, 0, width, horizonY);
 
         g.setColor(SEA_COLOR);
-        g.fillRect(0, horizonY, getWidth(), getHeight() - horizonY);
+        g.fillRect(0, horizonY, width, height - horizonY);
     }
 
     private void drawStaticObjects(Graphics2D g) {
@@ -319,18 +330,14 @@ public class DrawPanel extends JPanel implements ActionListener {
 
     private void drawSeaEnvironment(Graphics2D g) {
         for (Wave wave : waves) {
-            wave.update(ticksFromStart);
             wave.draw(g);
         }
 
         if (cruiseShip != null) {
-            cruiseShip.update();
-            adjustShipToWaves();
             cruiseShip.draw(g);
         }
 
         for (Fish fish : fishes) {
-            fish.update();
             if (fish.getY() > horizonY + 30) {
                 fish.draw(g);
             }
@@ -339,14 +346,12 @@ public class DrawPanel extends JPanel implements ActionListener {
 
     private void drawMovingObjects(Graphics2D g) {
         for (Bird bird : birds) {
-            bird.update(ticksFromStart);
             if (bird.getY() < horizonY) {
                 bird.draw(g);
             }
         }
 
         for (Car car : cars) {
-            car.update(getWidth());
             car.draw(g);
         }
     }
@@ -362,21 +367,5 @@ public class DrawPanel extends JPanel implements ActionListener {
         }
 
         g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
-    }
-
-    private void adjustShipToWaves() {
-        if (cruiseShip == null) return;
-
-        int shipX = cruiseShip.getX() + cruiseShip.getLength() / 2;
-        int lowestWaveY = getHeight();
-
-        for (Wave wave : waves) {
-            int waveY = wave.getWaveHeightAt(shipX, ticksFromStart);
-            if (waveY < lowestWaveY) {
-                lowestWaveY = waveY;
-            }
-        }
-
-        cruiseShip.setY(lowestWaveY - 10);
     }
 }
