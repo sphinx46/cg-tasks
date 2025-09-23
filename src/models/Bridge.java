@@ -6,7 +6,7 @@ import java.awt.geom.QuadCurve2D;
 public class Bridge {
     private final int x, height;
     private int y;
-    private int  width;
+    private int width;
     private final Color color;
     private final int archHeight;
     private int pillarCount;
@@ -27,6 +27,7 @@ public class Bridge {
     public int getY() {
         return y;
     }
+
     public void setY(int y) {
         this.y = y - 30;
     }
@@ -49,7 +50,6 @@ public class Bridge {
         saveRenderingHints(g);
 
         drawBridgeBase(g);
-        drawArch(g);
         drawRoad(g);
         drawPillars(g);
         drawRailings(g);
@@ -65,15 +65,6 @@ public class Bridge {
         g.fillRect(x, y, width, height);
     }
 
-    private void drawArch(Graphics2D g) {
-        QuadCurve2D arch = new QuadCurve2D.Float(
-            x, y + height,
-            x + (float) width / 2, y - archHeight,
-            x + width, y + height
-        );
-        g.fill(arch);
-    }
-
     private void drawRoad(Graphics2D g) {
         g.setColor(color.darker());
         QuadCurve2D road = new QuadCurve2D.Float(
@@ -87,7 +78,7 @@ public class Bridge {
     private void drawPillars(Graphics2D g) {
         g.setColor(new Color(80, 80, 80));
 
-        for (int i = 1; i < pillarCount - 1; i++) {
+        for (int i = 1; i < pillarCount; i++) {
             int pillarX = x + i * pillarSpacing;
             int pillarY = y + height;
             g.fillRect(pillarX - 5, pillarY, 10, 60);
@@ -122,13 +113,21 @@ public class Bridge {
         for (int i = 1; i < pillarCount; i++) {
             int pillarX = x + i * pillarSpacing;
             double progress = (double) i / pillarCount;
-            int railY = calculateRailYPosition(progress);
 
-            g.drawLine(pillarX, railY + height - 15, pillarX, railY + height - 5);
+            int topRailY = calculateRailY(progress, -10, -15);
+            int bottomRailY = calculateRailY(progress, 0, -5);
+
+            g.drawLine(pillarX, topRailY, pillarX, bottomRailY);
         }
     }
 
-    private int calculateRailYPosition(double progress) {
-        return (int) (y + height - archHeight * 4 * progress * (1 - progress));
+    private int calculateRailY(double progress, int archOffset, int baseOffset) {
+        float controlY = y - archHeight + archOffset;
+        float startY = y + height + baseOffset;
+        float endY = y + height + baseOffset;
+
+        return (int) ((1 - progress) * (1 - progress) * startY +
+            2 * (1 - progress) * progress * controlY +
+            progress * progress * endY);
     }
 }

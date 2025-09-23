@@ -26,8 +26,8 @@ public class Wave {
     }
 
     public void update(int ticks) {
-        if (width * 2 != 0) {
-            x = (-width + ((ticks + ticksOffset) * speed) % (width * 2));
+        if (width != 0) {
+            x = (-width + ((ticks + ticksOffset) * speed));
         }
     }
 
@@ -45,7 +45,7 @@ public class Wave {
         for (int i = 0; i <= width; i += step) {
             int waveX = x + i;
             double phase = (double)(waveX + ticksOffset * speed) / 30.0;
-            int waveY = y - (int)(Math.sin(phase) * height / 2);
+            int waveY = y + (int)(Math.sin(phase) * height / 2);
             wavePolygon.addPoint(waveX, waveY);
         }
 

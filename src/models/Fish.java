@@ -136,5 +136,4 @@ public class Fish {
     public int getY() {
         return y;
     }
-
 }

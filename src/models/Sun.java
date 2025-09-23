@@ -3,13 +3,12 @@ package models;
 import java.awt.*;
 
 public class Sun {
-    private int r;
-    private int R;
+    private final int r;
+    private final int R;
     private final int rays_number;
     private final Color c;
     private int panelWidth;
     private int panelHeight;
-    private final int margin = 20; // отступ от краев
 
     public Sun(int r, int rayLength, int rays_number, Color c) {
         this.r = r;
@@ -26,6 +25,7 @@ public class Sun {
     public void draw(Graphics2D g) {
         if (panelWidth <= 0 || panelHeight <= 0) return;
 
+        int margin = 20;
         int x = panelWidth - r - margin;
         int y = r + margin;
 

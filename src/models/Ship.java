@@ -178,7 +178,7 @@ public class Ship {
 
         g.setColor(Color.BLACK);
 
-        String shipName = "Антон Чехов";
+        String shipName = "Таск 1";
         int textX = x + length / 4;
         int textY = y + height - 5;
 

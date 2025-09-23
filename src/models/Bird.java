@@ -34,7 +34,7 @@ public class Bird {
         x += isFlyingRight ? speed : -speed;
 
         double phase = (ticks + phaseOffset) * 0.1;
-        y = baseY + (int)(Math.sin(phase) * amplitude);
+        y = baseY - (int)(Math.sin(phase) * amplitude);
 
         checkBounds();
     }

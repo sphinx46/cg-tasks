@@ -57,7 +57,6 @@ public class DrawPanel extends JPanel implements ActionListener {
         } else {
             updateDimensions();
         }
-
         drawScene(g);
     }
 
@@ -182,7 +181,7 @@ public class DrawPanel extends JPanel implements ActionListener {
         waves.clear();
 
         if (cruiseShip != null) {
-            int waveY = horizonY + 50;
+            int waveY = horizonY + 60;
             Wave mainWave = new Wave(cruiseShip.getX() - 50, waveY, getWidth() + 100, 20, 2);
             mainWave.setTicksOffset(-20);
             waves.add(mainWave);
@@ -257,20 +256,26 @@ public class DrawPanel extends JPanel implements ActionListener {
 
     private void initializeFish() {
         fishes.clear();
-        int fishCount = 3 + random.nextInt(3);
+        int fishCount = 4 + random.nextInt(3);
 
         for (int i = 0; i < fishCount; i++) {
             int minX = cruiseShip.getX() - 50;
-            int maxX = cruiseShip.getX() + cruiseShip.getLength() + 50;
-            int x = minX + random.nextInt(Math.max(maxX - minX, 50));
+            int maxX = cruiseShip.getX() + cruiseShip.getLength() + 75;
+            int x = minX + random.nextInt(Math.max(maxX - minX, 60));
 
             int shipBottomY = cruiseShip.getY() + cruiseShip.getHeight();
-            int minFishY = shipBottomY + 70;
-            int maxFishY = getHeight() - 60;
 
-            if (maxFishY < minFishY) maxFishY = minFishY + 30;
+            int minFishY = Math.max(shipBottomY + 105, horizonY + 100);
 
-            int y = minFishY + random.nextInt(Math.max(maxFishY - minFishY, 1));
+            int maxFishY = Math.max(getHeight() - 60, minFishY + 50);
+
+            if (maxFishY <= minFishY) {
+                maxFishY = minFishY + 100;
+            }
+
+            int yRange = Math.max(maxFishY - minFishY, 30);
+            int y = minFishY + random.nextInt(yRange);
+
             int width = 25 + random.nextInt(10);
             int height = 8 + random.nextInt(8);
             int speed = 1 + random.nextInt(2);
